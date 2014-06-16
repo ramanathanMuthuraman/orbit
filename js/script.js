@@ -1,9 +1,9 @@
 $(document).ready(function () {
 
-    var el = $("#outerRing");
+    var el = $("#ring-top");
     var outerRing = {
         width: Math.floor(el.width()),
-        height: Math.floor(el.height())
+        height: Math.floor(el.height() * 2)
 
     };
 
@@ -12,9 +12,9 @@ $(document).ready(function () {
         height: 32
 
     };
-    var startAngle = 30,
-        endAngle = -40;
-    var padX = 30,
+    var startAngle = 10,
+        endAngle = -20;
+    var padX = 10,
         padY = 10;
     var left, top;
 
@@ -27,31 +27,42 @@ $(document).ready(function () {
 
 
         if (position.left <= outerRing.width * 0.5 && position.top > 0) {
-            /*trnsition from bottom center to middle end*/
+            $("#" + val).find("img").removeClass("zindexLowest").addClass("zindexMedium");
+            startAngle = 10,
+                endAngle = -20;
+            /*transition from bottom center to middle end*/
             left = outerRing.width - section.width - padX;
-            top = (outerRing.height * 0.5) - section.height * 0.5 - padY
+            top = (outerRing.height * 0.5) - (section.height)
 
 
 
         }
 
         if (position.left > outerRing.width * 0.5) {
-            /*trnsition from middle end to top centre*/
+            $("#" + val).find("img").removeClass("zindexMedium").addClass("zindexLowest");
+            startAngle = 30,
+                endAngle = 0;
+            /*transition from middle end to top centre*/
             left = outerRing.width * 0.5 - section.width * 0.5;
-            top = -section.height * 0.5
+            top = -section.height;
         }
         if (position.top <= 0) {
-            /*trnsition from top centre to middle start*/
-
+            $("#" + val).find("img").removeClass("zindexMedium").addClass("zindexLowest");
+            /*transition from top centre to middle start*/
+            startAngle = 0,
+                endAngle = -30;
 
             left = padX;
-            top = outerRing.height * 0.5 - section.height * 0.5 - padY
+            top = outerRing.height * 0.5 - section.height;
         }
         if (position.left <= padX) {
+            $("#" + val).find("img").removeClass("zindexLowest").addClass("zindexMedium");
+            startAngle = 20,
+                endAngle = -10;
 
-            /*trnsition from middle start to bottom center*/
+            /*transition from middle start to bottom center*/
             left = (outerRing.width * 0.5) - (section.width * 0.5);
-            top = outerRing.height - section.height - padY
+            top = outerRing.height - section.height - padY;
         }
 
         /*
@@ -73,9 +84,9 @@ $(document).ready(function () {
 
     };
     var run = function (param) {
-          /*toggle the zindex class*/
-        $("#" + param).removeClass("zindexHigh").addClass("zindexLow");
-          /*move the section along the orbit*/
+        /*toggle the zindex class*/
+        $("#" + param).find("img").removeClass("zindexHigh").addClass("zindexMedium");
+        /*move the section along the orbit*/
         $("#" + param).stop(true, false).animate({
             path: bezier(param)
         }, 3000, function () {
@@ -86,9 +97,9 @@ $(document).ready(function () {
 
 
     };
-    var jumpInto = function (position) {
+    var jumpInto = function (param, endY) {
         /*define the initial bezier config values*/
-       
+        var position = $("#" + param).position();
         return new $.path.bezier({
             start: {
                 x: position.left,
@@ -97,7 +108,8 @@ $(document).ready(function () {
             },
             end: {
                 x: position.left,
-                y: outerRing.height - section.height - padY,
+                y: endY,
+
                 angle: 360
             }
 
@@ -107,42 +119,48 @@ $(document).ready(function () {
         /*show the section*/
         $("#" + param).show();
         /*get the co-ordinate of the section*/
-        var coordinates = $("#" + param).position();
-        /*
-        make the section popup from cap*/
+
+         /*make the section popup from cap*/
         $("#" + param).animate({
-            path: jumpInto(coordinates)
-        }, 3000, function () {
-          
-            /*move the section along the orbit*/
-            run($("#" + param).attr("id"));
-            /*create the other sections recursively*/
-            if($("#" + param).next(".section").attr("id"))
-            {
-                createSection($("#" + param).next(".section").attr("id"))
-            }
-                
+            path: jumpInto(param, -100)
+        }, 1500, function () {
+  
+
+           
+            $("#" + param).find("img").removeClass("zindexMedium").addClass("zindexHigh");
+            $("#" + param).animate({
+                path: jumpInto(param, outerRing.height - section.height - padY)
+            }, 1500, function () {
+                $("#" + param).find(".title").slideDown("slow");
+                /*move the section along the orbit*/
+                run($("#" + param).attr("id"));
+                /*create the other sections recursively*/
+                if ($("#" + param).next(".section").attr("id")) {
+                    createSection($("#" + param).next(".section").attr("id"))
+                }
 
 
+
+            });
         });
 
     }
     var init = function () {
-        /*
+            /*
         position the sections at the centre of the ring
         */
-         var hatTop = $(".hat").position().top;
-        $(".section").css({
-            "top": hatTop,
-            "left": outerRing.width * 0.5 - section.width * 0.5
-        })
-        /*
+            $(".title").hide();
+            $(".section").css({
+                    "top": 0,
+                    "left": outerRing.width * 0.5 - section.width * 0.5
+                })
+                /*
         pass the first section ID
         */
-        createSection($(".section").eq(0).attr("id"));
-    }
-    /*
+            createSection($(".section").eq(0).attr("id"));
+        }
+        /*
     start the animation
     */
     init();
-});
+}); 
