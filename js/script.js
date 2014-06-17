@@ -17,7 +17,7 @@ $(document).ready(function () {
     var padX = 10,
         padY = 10;
     var left, top;
-
+    var animationTimeSpan =5000;
 
 
     var bezier = function (val) {
@@ -89,7 +89,7 @@ $(document).ready(function () {
         /*move the section along the orbit*/
         $("#" + param).stop(true, false).animate({
             path: bezier(param)
-        }, 3000, function () {
+        }, animationTimeSpan, function () {
             /*recursively call the function to loop*/
             run(param);
         });
@@ -123,14 +123,14 @@ $(document).ready(function () {
          /*make the section popup from cap*/
         $("#" + param).animate({
             path: jumpInto(param, -100)
-        }, 1500, function () {
+        }, animationTimeSpan*0.5, function () {
   
 
            
             $("#" + param).find("img").removeClass("zindexMedium").addClass("zindexHigh");
             $("#" + param).animate({
                 path: jumpInto(param, outerRing.height - section.height - padY)
-            }, 1500, function () {
+            }, animationTimeSpan*0.5, function () {
                 $("#" + param).find(".title").slideDown("slow");
                 /*move the section along the orbit*/
                 run($("#" + param).attr("id"));
